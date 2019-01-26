@@ -1,0 +1,6 @@
+    mov r16, r24    ; create a copy of r24
+    mov r17, r25    ; create a copy of r25
+    call sumval     ; call the first function
+
+Can i use a label called "main"?
+; call sumval   ; call the first function

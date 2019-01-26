@@ -1,0 +1,8 @@
+assembly:
+    add r24, r25
+    clr r25
+
+effect:
+    Serial.println(testasm(254, 1)); <- this gives the correct answer of 255
+    Serial.println(testasm(255, 1)); <- this overflows
+    
