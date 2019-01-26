@@ -3,8 +3,8 @@
 void setup() {
   // put your setup code here, to run once
   Serial.begin(9600);
-  Serial.print("The diff of 3 and 10 is: ");
-  Serial.println(testasm(10, 3));
+  Serial.print("sumval(255, 240) + diffval(255, 240): ");
+  Serial.println(testasm(240, 255));
   pinMode (13, OUTPUT);
 }
 

@@ -32,74 +32,47 @@ start_of_assembly:
    ;
 
 start:
-    ; prolog
-    push r12            ; use r13:r12 for word
-    push r13
-    push r16            ; use r17:r16 for word
-    push r17
+    push r20            ; to store result of diffval
 
-    ; body
-    ;clr r24             ; clr r25:24
-    ;clr r25
-    ;call sumval         ; a + b
-    ;movw r16, r24       ; save the result
+    call diffval        ; call diffval -> r20
+    call sumval         ; call sumval -> r25:r24
+    add r24, r20
 
-    clr r24
-    clr r25
-    call diffval        ; abs(a - b)
-    movw r12, r24       ; save the result
-
-    clr r24
-    clr r25
-    movw r24, r12       ; save the final result
-
-    ; epilog
-    pop r17
-    pop r16
-    pop r13
-    pop r12
+    pop r20         
     rjmp end_of_assembly
 
 diffval:
-    ; prolog
-    push r16
-    push r17
-    mov r16, %1     ; arg a - 3 
-    mov r17, %2     ; arg b - 10
+    push r16            ; copy r24 and r25
+    push r17        
+    mov r16, r24        ; arg a
+    mov r17, r25        ; arg b
 
-    ; body
-    cp r17, r16     ; compare b with a
+    cp r17, r16         ; compare b with a
 
-    brsh samehigher       ; 
-    sub r16, r17          ; a > b
-    ; mov r24, r16
-    ldi r24, 1
+    brsh samehigher
+    sub r16, r17        ; a > b
+    mov r20, r16        ; load into result
+    rjmp epilog
 
-    samehigher:           ; b >= a
-    sub r17, r16
-    ; mov r24, r17 
-    ldi r24, 0
+    samehigher:         
+    sub r17, r16        ; b >= a
+    mov r20, r17        ; load into result
 
-    ; epilog
-    pop r17
+    epilog: pop r17
     pop r16
     ret
 
 sumval: 
-    ; prolog
-    ; use r16 and r17 for storage
-    push r16
-    push r17
-    mov r16, %1    ; arg a
-    mov r17, %2    ; arg b
+    push r16            ; copy r24 and r25
+    push r17  
+    mov r16, r24        ; arg a
+    mov r17, r25        ; arg b
 
-    ; body
-    add r16, r17    ; add r16 into r17
-    clr r17         ; set all the bits of r17 to 0
-    adc r17, r1     ; add the zero-reg + carry into r17
-    movw r24, r16   ; move r17:r16 to the 16-bit word in r25:r24
+    add r16, r17        ; add r17 into r16
+    clr r17             ; set all the bits of r17 to 0
+    adc r17, r1         ; add the zero-reg + carry into r17
+    movw r24, r16       ; move r17:r16 to the 16-bit word in r25:r24
 
-    ; epilog
     pop r17
     pop r16
     ret

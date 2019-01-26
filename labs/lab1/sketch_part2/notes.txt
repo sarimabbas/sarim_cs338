@@ -4,3 +4,27 @@
 
 Can i use a label called "main"?
 ; call sumval   ; call the first function
+
+
+    ;call sumval
+    ;movw r16, r24
+    ;movw r24, r12 
+    
+sumval: 
+    ; prolog
+    ; use r16 and r17 for storage
+    push r16
+    push r17
+    mov r16, %1    ; arg a
+    mov r17, %2    ; arg b
+
+    ; body
+    add r16, r17    ; add r16 into r17
+    clr r17         ; set all the bits of r17 to 0
+    adc r17, r1     ; add the zero-reg + carry into r17
+    movw r24, r16   ; move r17:r16 to the 16-bit word in r25:r24
+
+    ; epilog
+    pop r17
+    pop r16
+    ret
