@@ -52,7 +52,7 @@ diffval:
     brsh samehigher
     sub r16, r17        ; a > b
     mov r20, r16        ; load into result
-    rjmp epilog
+    rjmp epilog         ; finished
 
     samehigher:         
     sub r17, r16        ; b >= a
@@ -63,7 +63,7 @@ diffval:
     ret
 
 sumval: 
-    push r16            ; copy r24 and r25
+    push r16            ; copy r24 and r25 into two new registers
     push r17  
     mov r16, r24        ; arg a
     mov r17, r25        ; arg b
