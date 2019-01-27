@@ -63,10 +63,13 @@ start_of_assembly:
 
         subi r24, 1     ; check when to stop
         cpi r24, 1
-        brne loop
+        brne rep
 
         mov r24, r17    ; store final result
         ret
+
+        rep:
+        call loop
         
     ;
     ;  --- YOUR CODE ENDS ---
