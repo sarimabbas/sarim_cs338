@@ -2,5 +2,5 @@
     "board": "arduino:avr:uno",
     "programmer": "AVRISP mkII",
     "port": "/dev/cu.usbmodem14101",
-    "sketch": "labs/lab1/sketch_part3/sketch_asm.ino"
+    "sketch": "labs/lab2/sketch_feb14a/sketch_feb14a.ino"
 }
