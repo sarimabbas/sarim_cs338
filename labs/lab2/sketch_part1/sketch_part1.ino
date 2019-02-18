@@ -11,7 +11,7 @@ unsigned long debounceDelay = 20;    // the debounce time; increase if the outpu
 void setup() {
     Serial.begin(9600);
     
-    // set buttonPin to input and ledPin to output
+    // set buttonPin to input
     DDRD |= (0 << buttonPin);
     // set ledPin to output
     DDRB |= (1 << (ledPin - 8));
