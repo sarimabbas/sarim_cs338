@@ -3,15 +3,15 @@ void displayNumber(const int x);
 void displayNumberCore(const int x);
 void buttonPressed();
 
-const unsigned long displayNumberInterval = 2000;
-unsigned long previousMillis = 0;
-
 const int dataPin = 6;
 const int latchPin = 5;
 const int clockPin =  4;
 const int buttonPin = 2;
 
+// Interrupt service routine
 volatile int displayGlobal = 0;
+volatile unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 50;
 
 const unsigned numbers[10][5] = {
     {124, 130, 130, 130, 124}, // 0111 1100, 1000 0010, 1000 0010, 1000 0010, 0111 1100 => 0
@@ -29,23 +29,6 @@ const unsigned numbers[10][5] = {
 const unsigned cathodes[] = {
     127, 191, 223, 239, 247
 };
-
-void displayNumber(const int x) {
-    unsigned long currentMillis;
-    while(true) {
-        // get current time
-        currentMillis = millis();
-        // if the number has been displayed for the given interval
-        if (currentMillis - previousMillis >= displayNumberInterval) {
-            // record new start time and return
-            previousMillis = currentMillis;
-            return;
-        // else display the number
-        } else {
-            displayNumberCore(x);
-        }
-    }
-}
 
 void displayNumberCore(const int x) {
     // display the number for 2 seconds before exiting
@@ -65,7 +48,11 @@ void displayNumberCore(const int x) {
 }
 
 void buttonPressed() {
-    displayGlobal = (displayGlobal + 1) % 10;
+    unsigned long interruptTime = millis();
+    if (interruptTime - lastDebounceTime > debounceDelay) {
+        displayGlobal = (displayGlobal + 1) % 10;
+    }
+    lastDebounceTime = millis();
 }
 
 void setup() {
@@ -79,7 +66,7 @@ void setup() {
 }
 
 void loop() {
-    int reading = digitalRead(buttonPin);
-    Serial.println(reading);
+    // int reading = digitalRead(buttonPin);
+    // Serial.println(reading);
     displayNumberCore(displayGlobal);
 }

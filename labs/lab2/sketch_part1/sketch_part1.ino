@@ -5,8 +5,8 @@ int toggle = LOW;
 int buttonPinState = LOW;
 int lastButtonPinState = HIGH;
 
-unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
-unsigned long debounceDelay = 20;    // the debounce time; increase if the output flickers
+unsigned long lastDebounceTime = 0;
+unsigned long debounceDelay = 20;
 
 void setup() {
     Serial.begin(9600);
