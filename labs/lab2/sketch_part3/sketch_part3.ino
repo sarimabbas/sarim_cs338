@@ -11,7 +11,7 @@ const int buttonPin = 2;
 // Interrupt service routine
 volatile int displayGlobal = 0;
 volatile unsigned long lastDebounceTime = 0;
-unsigned long debounceDelay = 50;
+unsigned long debounceDelay = 200;
 
 const unsigned numbers[10][5] = {
     {124, 130, 130, 130, 124}, // 0111 1100, 1000 0010, 1000 0010, 1000 0010, 0111 1100 => 0
@@ -52,7 +52,7 @@ void buttonPressed() {
     if (interruptTime - lastDebounceTime > debounceDelay) {
         displayGlobal = (displayGlobal + 1) % 10;
     }
-    lastDebounceTime = millis();
+    lastDebounceTime = interruptTime;
 }
 
 void setup() {
@@ -66,7 +66,5 @@ void setup() {
 }
 
 void loop() {
-    // int reading = digitalRead(buttonPin);
-    // Serial.println(reading);
     displayNumberCore(displayGlobal);
 }

@@ -1,12 +1,9 @@
 // Sarim Abbas, 2019
-// Notes: I have used myPinMode(), myShiftOut() and myDigitalWrite(), which are custom functions
 
-// assume LSBFIRST
-void myShiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t val);
-// assume PIND
-void myPinMode(uint8_t pin, uint8_t mode);
-// assume PORTD
-void myDigitalWrite(uint8_t pin, uint8_t mode);
+// Notes: I have used myPinMode(), myShiftOut() and myDigitalWrite(), which are custom functions
+void myShiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t val); // assume LSBFIRST
+void myPinMode(uint8_t pin, uint8_t mode); // assume PIND
+void myDigitalWrite(uint8_t pin, uint8_t mode); // assume PORTD
 
 void displayNumber(const int x);
 void displayNumberCore(const int x);
@@ -56,29 +53,21 @@ void displayNumberCore(const int x) {
     // display the number for 2 seconds before exiting
     for (int i = 0; i < 5; i++) {
         // prepare
-        // digitalWrite(latchPin, LOW);
         myDigitalWrite(latchPin, LOW);
 
         // set the cathodes
-        // shiftOut(dataPin, clockPin, LSBFIRST, cathodes[i]);
         myShiftOut(dataPin, clockPin, cathodes[i]);
 
         // set the anodes
-        // shiftOut(dataPin, clockPin, LSBFIRST, numbers[x][i]);
         myShiftOut(dataPin, clockPin, numbers[x][i]);
 
         // store
-        //digitalWrite(latchPin, HIGH);
         myDigitalWrite(latchPin, HIGH);
     }
 }
 
 void myShiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t val) {
-    uint8_t i;
-    for (i = 0; i < 8; i++)  {
-        // digitalWrite(dataPin, !!(val & (1 << i)));
-        // digitalWrite(clockPin, HIGH);
-        // digitalWrite(clockPin, LOW);   
+    for (uint8_t i = 0; i < 8; i++)  {
         myDigitalWrite(dataPin, !!(val & (1 << i)));
         myDigitalWrite(clockPin, HIGH);
         myDigitalWrite(clockPin, LOW);          
@@ -91,19 +80,14 @@ void myPinMode(uint8_t pin, uint8_t mode) {
 
 void myDigitalWrite(uint8_t pin, uint8_t mode) {
     if (mode == HIGH) {
-        // set bit
-        PORTD |= (1 << pin);
+        PORTD |= (1 << pin); // set bit
     } else {
-        // clear bit
-        PORTD &= ~(1 << pin);
+        PORTD &= ~(1 << pin); // clear bit
     }
 }
 
 void setup() {
     Serial.begin(9600);
-    // pinMode(dataPin, OUTPUT);
-    // pinMode(latchPin, OUTPUT);
-    // pinMode(clockPin, OUTPUT);
     myPinMode(dataPin, OUTPUT);
     myPinMode(latchPin, OUTPUT);
     myPinMode(clockPin, OUTPUT);
@@ -113,14 +97,12 @@ void setup() {
     // cathodes: [a, b, c,  d, e, f, g, h]
     // cathodes: [1, 3, 10, 7, 8, x, x, x]
     // ACTIVATE with 0
-    // shiftOut(dataPin, clockPin, LSBFIRST, 127);
 
     // 7 anodes
     // anodes: [x,  x,  x, x, x, x, x, x]
     // anodes: [a,  b,  c, d, e, f, g, h]
     // anodes: [12, 11, 2, 9, 4, 5, 6, x]
     // ACTIVATE with 1
-    // shiftOut(dataPin, clockPin, LSBFIRST, 130);
 }
 
 void loop() {
