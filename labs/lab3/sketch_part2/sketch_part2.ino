@@ -1,19 +1,21 @@
+// CITATION: linked example in the spec
+
+// constants
 const int triggerPin = 7;
 const int echoPin = 8;
-
 const int photocellPin = A0;
 const int ledPin = 11;
 const int ledRPin = 3;
 const int ledGPin = 4;
 const int ledBPin = 5;
 
-// Anything over 400 cm (23200 us pulse) is "out of range"
+// Anything over 400 cm/23200 us is out of range
 const unsigned int MAX_DIST = 23200;
 
 void setup() {
     pinMode(photocellPin, INPUT);
     pinMode(echoPin, INPUT);
-    // The Trigger pin will tell the sensor to range find
+    // trigger pin will tell the sensor to range find
     pinMode(triggerPin, OUTPUT);
     digitalWrite(triggerPin, LOW);
 
@@ -33,8 +35,6 @@ void loop() {
     unsigned long t1;
     unsigned long t2;
     unsigned long pulseWidth;
-    // float cm;
-    // float inches;
 
     // Hold the trigger pin high for at least 10 us
     digitalWrite(triggerPin, HIGH);
