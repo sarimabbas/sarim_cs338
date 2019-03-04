@@ -74,11 +74,26 @@ void loop() {
         digitalWrite(ledBPin, HIGH);
     }
 
-    // Photocell 
+    // Note:
+    // The specification and Piazza answers were a bit confusing
+    // The spec: "Combine this with part 1 and use the photocell to set the brightness."
+    // Piazza: "The ultrasonic range finder value should be used to set the brightness."
+
+    // Currently I am only using the photocell to set the brightness
     int photocellReading = analogRead(photocellPin);
     int mappedPhotocellReading = map(photocellReading, 0, 1023, 0, 255);
     Serial.println(mappedPhotocellReading);
     analogWrite(ledPin, mappedPhotocellReading);
+
+    // However, if setting the brightness due to distance is required, I am
+    // also writing the code for that below. Thanks
+    // if (mappedRangeReading < 40) {
+    //     analogWrite(ledPin, 40);
+    // } else if (mappedRangeReading >= 40 && mappedRangeReading < 120) {
+    //     analogWrite(ledPin, 120);
+    // } else if (mappedRangeReading >= 120) {
+    //     analogWrite(ledPin, 250);
+    // }
 
     // Wait at least 60ms before next measurement
     delay(1000);
