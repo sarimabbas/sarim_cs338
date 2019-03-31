@@ -13,11 +13,20 @@
 extern "C" {
 #endif
 
-typedef struct process_state process_t;
-   /* opaque definition of process type; you must provide this
-      implementation.
-   */
+/* opaque definition of process type; you must provide this
+   implementation.
+*/
+typedef struct process_state {
+    unsigned int sp;            /* stack pointer */
+    struct process_state* next; /* link to next process */
+} process_t;
 
+// also defined a manager for the many processes
+typedef struct process_state_manager {
+    process_t* head;
+    process_t* tail;
+    int count;
+} psm;
 
 /*------------------------------------------------------------------------
 
@@ -27,8 +36,10 @@ typedef struct process_state process_t;
 
 /* ====== Part 1 ====== */
 
-extern process_t *current_process; 
+extern process_t* current_process; 
 /* the currently running process */
+
+extern psm* global_manager;
 
 __attribute__((used)) unsigned int process_select (unsigned int cursp);
 /* Called by the runtime system to select another process.
