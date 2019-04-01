@@ -46,6 +46,8 @@ __attribute__((used)) unsigned int process_select (unsigned int cursp);
    "cursp" = the stack pointer for the currently running process
 */
 
+unsigned int process_select_two(unsigned int cursp);
+
 void process_start (void);
 /* Starts up the concurrent execution */
 
