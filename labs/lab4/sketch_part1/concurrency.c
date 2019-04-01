@@ -109,7 +109,6 @@ __attribute__((used)) void process_terminated() {
         "ldi r24, lo8(0)\n\t"               // clear r24 and r25
         "ldi r25, hi8(0)\n\t"               
         "rjmp .dead_proc_entry");           // jump to within process_timer_interrupt(), which will soon call process_select()        
-                                            // TODO: dead process entry?   
 }
 
 void process_timer_interrupt();

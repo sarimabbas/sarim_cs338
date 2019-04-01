@@ -8,7 +8,7 @@
 // ** part 1
 
 // declare the extern variable
-process_t* current_process; // TODO: is this thing only for the yield() function to do a context switch and nothing else?  
+process_t* current_process;
 // global manager
 psm* global_manager;
 // global lock
@@ -138,8 +138,7 @@ __attribute__((used)) void process_terminated() {
         "out __SP_L__, r24\n\t"
         "ldi r24, lo8(0)\n\t"               // clear r24 and r25
         "ldi r25, hi8(0)\n\t"               
-        "rjmp .dead_proc_entry");           // jump to within process_timer_interrupt(), which will soon call process_select()        
-                                            // TODO: dead process entry?   
+        "rjmp .dead_proc_entry");           // jump to within process_timer_interrupt(), which will soon call process_select()
 }
 
 void process_timer_interrupt();
