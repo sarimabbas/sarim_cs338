@@ -25,7 +25,7 @@ int process_create(void (*f)(void), int n) {
     }
 
     // add to the queue and return
-    psmPushToFront(global_manager, stk);
+    psmPushToBack(global_manager, stk);
 
     enableInterruptsWrapper();
     return 0;
