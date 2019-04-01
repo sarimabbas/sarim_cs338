@@ -6,14 +6,14 @@ void psmTest2();
 
 int ledOne = 6;
 int ledTwo = 7;
-unsigned long startMillis;  
+unsigned long startMillis;
+unsigned long startMillis2;
 long interval = 10000;     // interval at which to blink (milliseconds)
 
 void p1(void) {
-    pPrint(current_process);
     digitalWrite(ledOne, HIGH);
 
-    // option 1
+    // delay
     startMillis = millis();
     while(true) {
         if (millis() - startMillis > interval) {
@@ -22,38 +22,27 @@ void p1(void) {
         }
     }
 
-    // option 2
-    // delay(interval);
-    // digitalWrite(ledOne, LOW);
-
-    pPrint(current_process);
     return;
 }
 
 void p2(void) {
-    pPrint(current_process);
     digitalWrite(ledTwo, HIGH);
 
-    // option 1
-    startMillis = millis();
+    // delay
+    startMillis2 = millis();
     while (true) {
-        if (millis() - startMillis > interval) {
+        if (millis() - startMillis2 > interval) {
             digitalWrite(ledTwo, LOW);
             break;
         }
     }
 
-    // option 2
-    // delay(interval);
-    // digitalWrite(ledOne, LOW);
-
-    pPrint(current_process);
     return;
 }
 
 void setup() {
     // TODO: debugging. remove later
-    Serial.begin(9600);
+    // Serial.begin(9600);
     pinMode(ledOne, OUTPUT);
     pinMode(ledTwo, OUTPUT);
 
@@ -63,13 +52,8 @@ void setup() {
     // psmTest2();
     // return;
 
-    if (process_create(p1, 64) < 0) {
-        return;
-    }
-    if (process_create(p2, 64) < 0) {
-        return;
-    }
-
+    if (process_create(p1, 64) < 0) { return; }
+    if (process_create(p2, 64) < 0) { return; }
     // yields are disabled because current_process == NULL until process_start() is called
 }
 
@@ -135,7 +119,26 @@ void psmTest2() {
     psmPrint(global_manager);
     psmDestroy(&global_manager);
     psmPrint(global_manager);
+
+    // test 5: psmFind
+    Serial.println("test 5: psmFind");
+    global_manager = psmCreate();
+    psmPrint(global_manager);
+    pPrint(psmFind(global_manager, 123));
+    psmPushToBack(global_manager, 123);
+    psmPushToBack(global_manager, 456);
+    psmPushToBack(global_manager, 789);
+    psmPushToFront(global_manager, 00000);
+    psmPushToFront(global_manager, 11111);
+    psmPrint(global_manager);
+    pPrint(psmFind(global_manager, 123));
+    pPrint(psmFind(global_manager, 456));
+    pPrint(psmFind(global_manager, 789));
+    pPrint(psmFind(global_manager, 11111));
+    psmDestroy(&global_manager);
+    psmPrint(global_manager);
 }
+
 
 
 void psmTestImplementation() {

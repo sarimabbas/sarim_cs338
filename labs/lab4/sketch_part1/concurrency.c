@@ -9,11 +9,12 @@
 
 // declare the extern variable
 process_t* current_process; // TODO: is this thing only for the yield() function to do a context switch and nothing else?  
-
 // global manager
 psm* global_manager;
 
-int process_create(void (*f)(void), int n) {    
+int process_create(void (*f)(void), int n) {
+    disableInterruptsWrapper();
+
     unsigned int stk = process_init(f, n);
     if (stk == 0) {  return -1; }
 
@@ -25,6 +26,8 @@ int process_create(void (*f)(void), int n) {
 
     // add to the queue and return
     psmPushToFront(global_manager, stk);
+
+    enableInterruptsWrapper();
     return 0;
 }
 
@@ -79,7 +82,6 @@ unsigned int process_select(unsigned int cursp) {
             unsigned int sp = psmPop(global_manager);
             psmPushToFront(global_manager, sp);
             current_process = psmFind(global_manager, sp);
-
             // return sp of current
             return sp;
         }
@@ -87,37 +89,27 @@ unsigned int process_select(unsigned int cursp) {
         // terminated
         if (current_process != NULL) {
 
-            // debug check
-            current_process->sp = cursp;
-            pPrint(current_process);
-
             // get rid of the current process at front
-            unsigned int sp = psmPop(global_manager);
+            current_process = NULL;
+            psmPop(global_manager);
 
             // see if any processes left
             if (global_manager->count == 0) {
                 psmDestroy(&global_manager);
                 global_manager = NULL;
-                current_process = NULL;
                 return 0;
             }
-
-            // choose a new process to be the current
-            sp = psmPop(global_manager);
-            psmPushToFront(global_manager, sp);
-            current_process = psmFind(global_manager, sp);
-            return sp;
         }
-    }
 
     // if cursp != 0
+    } else  {
+        // "update" current process and send to back
+        psmPop(global_manager);
+        psmPushToBack(global_manager, cursp);
+    }
 
-    // update process with cursp
+    // choose new as current
     unsigned int sp = psmPop(global_manager);
-    psmPushToBack(global_manager, cursp);
-
-    // choose new as current    
-    sp = psmPop(global_manager);
     psmPushToFront(global_manager, sp);
     current_process = psmFind(global_manager, sp);
     return sp;
@@ -283,7 +275,7 @@ unsigned int process_init(void (*f)(void), int n) {
 
     n -= EXTRA_PAD;
 
-    stkspace[n - 1] = ((unsigned int)process_terminated) & 0xff; // this is actually the ret address on the stack. After a process finishes executing, the process_terminated() function is called
+    stkspace[n - 1] = ((unsigned int)process_terminated) & 0xff;
     stkspace[n - 2] = ((unsigned int)process_terminated) >> 8;
     stkspace[n - 3] = ((unsigned int)f) & 0xff;
     stkspace[n - 4] = ((unsigned int)f) >> 8;

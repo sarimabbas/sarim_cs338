@@ -154,3 +154,11 @@ void pPrint(process_t* process) {
     Serial.println("]");
     Serial.flush();
 }
+
+void disableInterruptsWrapper(){
+    noInterrupts();
+}
+
+void enableInterruptsWrapper() {
+    interrupts();
+}

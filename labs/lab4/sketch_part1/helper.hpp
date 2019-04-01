@@ -22,6 +22,10 @@ void SerialPrintWrapper(char* msg);
 void pPrint(process_t* process);
 void psmPrint(psm* manager);
 
+//////////// * interrupt functions
+void disableInterruptsWrapper();
+void enableInterruptsWrapper();
+
 #ifdef __cplusplus
 }
 #endif
