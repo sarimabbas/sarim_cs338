@@ -1,14 +1,45 @@
 #include "concurrency.h"
 #include "helper.hpp"
 
-void psmTestImplementation();
-void psmTest2();
+// run two LEDs at same time
+int concurrencyTest1();
+void p3();
+void p4();
+
+// run two LEDs on and off after a delay
+int concurrencyTest2();
+void p1();
+void p2();
+
+// check the push, pop, etc operations
+void psmTestDataStructure();
 
 int ledOne = 6;
 int ledTwo = 7;
 unsigned long startMillis;
 unsigned long startMillis2;
-long interval = 10000;     // interval at which to blink (milliseconds)
+long interval = 10000;  // 10 seconds
+
+void setup() {
+    pinMode(ledOne, OUTPUT);
+    pinMode(ledTwo, OUTPUT);
+
+    global_manager = NULL;
+    current_process = NULL;
+
+    if (concurrencyTest2() < 0 ) { return; }
+    // if (concurrencyTest1() < 0 ) { return; }
+    
+    // yields are disabled because current_process == NULL until process_start() is called
+}
+
+void loop() {
+    process_start();
+    /* if you get here, then all processes are either finished or
+       there is deadlock */
+    while (1)
+        ;
+}
 
 void p1(void) {
     digitalWrite(ledOne, HIGH);
@@ -40,32 +71,27 @@ void p2(void) {
     return;
 }
 
-void setup() {
-    // TODO: debugging. remove later
-    // Serial.begin(9600);
-    pinMode(ledOne, OUTPUT);
-    pinMode(ledTwo, OUTPUT);
-
-    global_manager = NULL;
-    current_process = NULL;
-
-    // psmTest2();
-    // return;
-
-    if (process_create(p1, 64) < 0) { return; }
-    if (process_create(p2, 64) < 0) { return; }
-    // yields are disabled because current_process == NULL until process_start() is called
+void p3(void) {
+    digitalWrite(ledOne, HIGH);
 }
 
-void loop() {
-    process_start();
-    /* if you get here, then all processes are either finished or
-       there is deadlock */
-    while (1)
-        ;
+void p4(void) {
+    digitalWrite(ledOne, HIGH);
 }
 
-void psmTest2() {
+int concurrencyTest1() {
+    if (process_create(p3, 64) < 0) { return -1; }
+    if (process_create(p4, 64) < 0) { return -1; }
+    return 0;
+}
+
+int concurrencyTest2() {
+    if (process_create(p1, 64) < 0) { return -1; }
+    if (process_create(p2, 64) < 0) { return -1; }
+    return 0;
+}
+
+void psmTestDataStructure() {
     unsigned int sp1, sp2, sp3;
     
     // test 1: push to back
@@ -137,54 +163,4 @@ void psmTest2() {
     pPrint(psmFind(global_manager, 11111));
     psmDestroy(&global_manager);
     psmPrint(global_manager);
-}
-
-
-
-void psmTestImplementation() {
-    // unsigned int sp;
-
-    // // create two processes
-    // psmPrint(global_manager);
-    // Serial.println("create two processes");
-    // if (process_create(p1, 64) < 0) { return; }
-    // psmPrint(global_manager);
-    // if (process_create(p2, 64) < 0) { return; }
-    // psmPrint(global_manager);
-
-    // // simulate the first selection
-    // Serial.println("simulate the first selection");
-    // pPrint(current_process);
-    // sp = psmPop(global_manager);
-    // Serial.println(sp);
-    // psmPushToBack(global_manager, current_process);
-    // Serial.println(current_process->sp);
-    // Serial.flush();
-
-    // // simulate a termination
-    // Serial.println("simulate a termination");
-    // current_process = psmRemoveByPtr(global_manager, current_process);
-    // Serial.println(current_process->sp);
-    // free(current_process);
-    // psmPrint(global_manager);
-
-    // // choose again
-    // Serial.println("choose again");
-    // process_t* select_process = psmRemoveFromFront(global_manager);
-    // psmAddToBack(global_manager, select_process);
-    // current_process = select_process;
-    // psmPrint(global_manager);
-    // Serial.println(current_process->sp);
-
-    // // remove this one too
-    // Serial.println("remove this one too");
-    // current_process = psmRemoveByPtr(global_manager, current_process);
-    // Serial.println(current_process->sp);
-    // free(current_process);
-    // psmPrint(global_manager);
-
-    // // destroy the list
-    // Serial.println("destroy the list");
-    // psmDestroy(&global_manager);
-    // psmPrint(global_manager);
 }
