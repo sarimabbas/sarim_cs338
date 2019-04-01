@@ -40,8 +40,6 @@ extern process_t* current_process;
 
 extern psm* global_manager;
 
-unsigned int process_select_two(unsigned int cursp);
-
 __attribute__((used)) unsigned int process_select(unsigned int cursp);
 /* Called by the runtime system to select another process.
    "cursp" = the stack pointer for the currently running process

@@ -8,7 +8,7 @@
 // ** part 1
 
 // declare the extern variable
-process_t* current_process; // TODO: is this thing only for the yield() function to do a context switch and nothing else?  
+process_t* current_process; 
 // global manager
 psm* global_manager;
 
@@ -37,36 +37,6 @@ void process_start(void) {
 
     // call process_begin (which will invoke process_select)
     process_begin();
-}
-
-unsigned int process_select_two(unsigned int cursp) {
-    if (cursp == 0) {
-        
-        // start new
-        if (current_process == NULL) {
-            // remove from front
-            unsigned int sp = psmPop(global_manager);
-
-            // add to back and designate as current process
-            psmPushToBack(global_manager, sp);
-            process_t* tmp = psmFind(global_manager, sp);
-            if (tmp != NULL) { current_process = tmp; }
-
-            // return sp of current
-            return sp;
-        }
-
-        // update terminated
-        if (current_process != NULL) {
-            current_process->sp = cursp;
-            pPrint(current_process);
-            return 0;
-        }
-    } 
-
-    // update normally
-    current_process->sp = cursp;
-    return current_process->sp;
 }
 
 unsigned int process_select(unsigned int cursp) {
@@ -114,12 +84,6 @@ unsigned int process_select(unsigned int cursp) {
     current_process = psmFind(global_manager, sp);
     return sp;
 }
-
-// ! end part 1
-
-// * part 2
-
-// ! end part 2
 
 __attribute__((used)) unsigned char _orig_sp_hi, _orig_sp_lo;
 

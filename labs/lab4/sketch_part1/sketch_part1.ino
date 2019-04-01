@@ -14,8 +14,8 @@ void p2();
 // check the push, pop, etc operations
 void psmTestDataStructure();
 
-int ledOne = 6;
-int ledTwo = 7;
+int ledOne = 4;
+int ledTwo = 5;
 unsigned long startMillis;
 unsigned long startMillis2;
 long interval = 10000;  // 10 seconds
@@ -41,12 +41,26 @@ void loop() {
         ;
 }
 
+int concurrencyTest1() {
+    if (process_create(p3, 64) < 0) { return -1; }
+    if (process_create(p4, 64) < 0) { return -1; }
+    return 0;
+}
+void p3(void) { digitalWrite(ledOne, HIGH); }
+void p4(void) { digitalWrite(ledOne, HIGH); }
+
+int concurrencyTest2() {
+    if (process_create(p1, 64) < 0) { return -1; }
+    if (process_create(p2, 64) < 0) { return -1; }
+    return 0;
+}
+
 void p1(void) {
     digitalWrite(ledOne, HIGH);
 
     // delay
     startMillis = millis();
-    while(true) {
+    while (true) {
         if (millis() - startMillis > interval) {
             digitalWrite(ledOne, LOW);
             break;
@@ -69,26 +83,6 @@ void p2(void) {
     }
 
     return;
-}
-
-void p3(void) {
-    digitalWrite(ledOne, HIGH);
-}
-
-void p4(void) {
-    digitalWrite(ledOne, HIGH);
-}
-
-int concurrencyTest1() {
-    if (process_create(p3, 64) < 0) { return -1; }
-    if (process_create(p4, 64) < 0) { return -1; }
-    return 0;
-}
-
-int concurrencyTest2() {
-    if (process_create(p1, 64) < 0) { return -1; }
-    if (process_create(p2, 64) < 0) { return -1; }
-    return 0;
 }
 
 void psmTestDataStructure() {
@@ -147,7 +141,6 @@ void psmTestDataStructure() {
     psmPrint(global_manager);
 
     // test 5: psmFind
-    Serial.println("test 5: psmFind");
     global_manager = psmCreate();
     psmPrint(global_manager);
     pPrint(psmFind(global_manager, 123));
