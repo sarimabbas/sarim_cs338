@@ -4,17 +4,23 @@ extern "C" {
 
 #include "concurrency.h"
 
-void SerialPrintWrapper(char* msg);
-void pPrint(process_t* process);
+//////////// * create, destroy and search functions
+
 psm* psmCreate(void);
 void psmDestroy(psm** managerPtr);
-void psmAddToBack(psm* manager, process_t* process);
-void psmAddToFront(psm* manager, process_t* process);
-process_t* psmRemoveFromFront(psm* manager);
-process_t* psmRemoveByPtr(psm* manager, process_t* process);
 process_t* psmFind(psm* manager, unsigned int sp);
+
+//////////// * add and remove functions
+
+unsigned int psmPop(psm* manager);
+int psmPushToBack(psm* manager, unsigned int sp);
+int psmPushToFront(psm* manager, unsigned int sp);
+
+//////////// * print functions
+
+void SerialPrintWrapper(char* msg);
+void pPrint(process_t* process);
 void psmPrint(psm* manager);
-void psmPush(psm* manager, unsigned int sp);
 
 #ifdef __cplusplus
 }

@@ -24,7 +24,6 @@ typedef struct process_state {
 // also defined a manager for the many processes
 typedef struct process_state_manager {
     process_t* head;
-    process_t* tail;
     int count;
 } psm;
 

@@ -2,6 +2,7 @@
 #include "helper.hpp"
 
 void psmTestImplementation();
+void psmTest2();
 
 int ledOne = 6;
 int ledTwo = 7;
@@ -24,7 +25,6 @@ void p1(void) {
     // option 2
     // delay(interval);
     // digitalWrite(ledOne, LOW);
-
 
     pPrint(current_process);
     return;
@@ -52,16 +52,16 @@ void p2(void) {
 }
 
 void setup() {
-    // make sure ready queue is NULL;
+    // TODO: debugging. remove later
+    Serial.begin(9600);
+    pinMode(ledOne, OUTPUT);
+    pinMode(ledTwo, OUTPUT);
+
     global_manager = NULL;
     current_process = NULL;
 
-    // TODO: debugging. remove later
-    Serial.begin(9600);
-    
-    // simultaneous LED test
-    pinMode(ledOne, OUTPUT);
-    pinMode(ledTwo, OUTPUT);
+    // psmTest2();
+    // return;
 
     if (process_create(p1, 64) < 0) {
         return;
@@ -81,49 +81,107 @@ void loop() {
         ;
 }
 
-
-void psmTestImplementation() {
-    // create two processes
+void psmTest2() {
+    unsigned int sp1, sp2, sp3;
+    
+    // test 1: push to back
+    global_manager = psmCreate();
     psmPrint(global_manager);
-    Serial.println("create two processes");
-    if (process_create(p1, 64) < 0) { return; }
+    psmPushToBack(global_manager, 123);
+    psmPushToBack(global_manager, 456);
+    psmPushToBack(global_manager, 789);
     psmPrint(global_manager);
-    if (process_create(p2, 64) < 0) { return; }
-    psmPrint(global_manager);
-
-    // simulate the first selection
-    Serial.println("simulate the first selection");
-    Serial.println(current_process->sp);
-    current_process = psmRemoveFromFront(global_manager);
-    Serial.println(current_process->sp);
-    psmAddToBack(global_manager, current_process);
-    Serial.println(current_process->sp);
-    Serial.flush();
-
-    // simulate a termination
-    Serial.println("simulate a termination");
-    current_process = psmRemoveByPtr(global_manager, current_process);
-    Serial.println(current_process->sp);
-    free(current_process);
-    psmPrint(global_manager);
-
-    // choose again
-    Serial.println("choose again");
-    process_t* select_process = psmRemoveFromFront(global_manager);
-    psmAddToBack(global_manager, select_process);
-    current_process = select_process;
-    psmPrint(global_manager);
-    Serial.println(current_process->sp);
-
-    // remove this one too
-    Serial.println("remove this one too");
-    current_process = psmRemoveByPtr(global_manager, current_process);
-    Serial.println(current_process->sp);
-    free(current_process);
-    psmPrint(global_manager);
-
-    // destroy the list
-    Serial.println("destroy the list");
     psmDestroy(&global_manager);
     psmPrint(global_manager);
+
+    // test 2: push to front
+    global_manager = psmCreate();
+    psmPushToFront(global_manager, 123);
+    psmPushToFront(global_manager, 456);
+    psmPushToFront(global_manager, 789);
+    psmPrint(global_manager);
+    psmDestroy(&global_manager);
+    psmPrint(global_manager);
+
+    // test 3: pop all
+    global_manager = psmCreate();
+    psmPushToFront(global_manager, 123);
+    psmPushToFront(global_manager, 456);
+    psmPushToFront(global_manager, 789);
+    psmPrint(global_manager);
+    psmPop(global_manager);
+    psmPop(global_manager);
+    psmPop(global_manager);
+    psmPop(global_manager);
+    psmPrint(global_manager);
+    psmDestroy(&global_manager);
+    psmPrint(global_manager);
+
+    // test 4: process create (uses push to front)
+    process_create(p1, 64);
+    process_create(p2, 64);
+    process_create(p2, 64);
+    psmPrint(global_manager);
+    sp1 = psmPop(global_manager);
+    psmPrint(global_manager);
+    sp2 = psmPop(global_manager);
+    sp3 = psmPop(global_manager);
+    psmPrint(global_manager);
+    psmPop(global_manager);
+    psmPrint(global_manager);
+    psmPushToBack(global_manager, sp1);
+    psmPushToBack(global_manager, sp2);
+    psmPushToBack(global_manager, sp3);
+    psmPrint(global_manager);
+    psmDestroy(&global_manager);
+    psmPrint(global_manager);
+}
+
+
+void psmTestImplementation() {
+    // unsigned int sp;
+
+    // // create two processes
+    // psmPrint(global_manager);
+    // Serial.println("create two processes");
+    // if (process_create(p1, 64) < 0) { return; }
+    // psmPrint(global_manager);
+    // if (process_create(p2, 64) < 0) { return; }
+    // psmPrint(global_manager);
+
+    // // simulate the first selection
+    // Serial.println("simulate the first selection");
+    // pPrint(current_process);
+    // sp = psmPop(global_manager);
+    // Serial.println(sp);
+    // psmPushToBack(global_manager, current_process);
+    // Serial.println(current_process->sp);
+    // Serial.flush();
+
+    // // simulate a termination
+    // Serial.println("simulate a termination");
+    // current_process = psmRemoveByPtr(global_manager, current_process);
+    // Serial.println(current_process->sp);
+    // free(current_process);
+    // psmPrint(global_manager);
+
+    // // choose again
+    // Serial.println("choose again");
+    // process_t* select_process = psmRemoveFromFront(global_manager);
+    // psmAddToBack(global_manager, select_process);
+    // current_process = select_process;
+    // psmPrint(global_manager);
+    // Serial.println(current_process->sp);
+
+    // // remove this one too
+    // Serial.println("remove this one too");
+    // current_process = psmRemoveByPtr(global_manager, current_process);
+    // Serial.println(current_process->sp);
+    // free(current_process);
+    // psmPrint(global_manager);
+
+    // // destroy the list
+    // Serial.println("destroy the list");
+    // psmDestroy(&global_manager);
+    // psmPrint(global_manager);
 }

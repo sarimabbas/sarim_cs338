@@ -14,23 +14,17 @@ process_t* current_process; // TODO: is this thing only for the yield() function
 psm* global_manager;
 
 int process_create(void (*f)(void), int n) {    
-    // use the provided init function
     unsigned int stk = process_init(f, n);
-    if (stk == 0) {
-        // if error and could not allocate
-        free(new_process);
-        return -1;
-    }
+    if (stk == 0) {  return -1; }
 
     // create ready queue if not done already
     if (global_manager == NULL) {
         global_manager = psmCreate();
+        if (global_manager == NULL) { return -1; }
     }
 
-    // add to the queue
-    psmPushToBack(global_manager, stk);
-
-    // finished
+    // add to the queue and return
+    psmPushToFront(global_manager, stk);
     return 0;
 }
 
@@ -44,11 +38,19 @@ void process_start(void) {
 
 unsigned int process_select_two(unsigned int cursp) {
     if (cursp == 0) {
+        
         // start new
         if (current_process == NULL) {
-            current_process = psmRemoveFromFront(global_manager);
-            psmAddToBack(global_manager, current_process);
-            return current_process->sp;
+            // remove from front
+            unsigned int sp = psmPop(global_manager);
+
+            // add to back and designate as current process
+            psmPushToBack(global_manager, sp);
+            process_t* tmp = psmFind(global_manager, sp);
+            if (tmp != NULL) { current_process = tmp; }
+
+            // return sp of current
+            return sp;
         }
 
         // update terminated
@@ -70,32 +72,55 @@ unsigned int process_select(unsigned int cursp) {
     if (global_manager->count < 1) { return 0; }
 
     if (cursp == 0) {
+
         // start new
         if (current_process == NULL) {
-            current_process = psmRemoveFromFront(global_manager);
-            psmAddToBack(global_manager, current_process);
-            return current_process->sp;
+            // remove from front, add back, and designate as current process
+            unsigned int sp = psmPop(global_manager);
+            psmPushToFront(global_manager, sp);
+            current_process = psmFind(global_manager, sp);
+
+            // return sp of current
+            return sp;
         }
 
-        // update terminated
+        // terminated
         if (current_process != NULL) {
+
+            // debug check
             current_process->sp = cursp;
             pPrint(current_process);
-            current_process = psmRemoveByPtr(global_manager, current_process);
-            free(current_process);
+
+            // get rid of the current process at front
+            unsigned int sp = psmPop(global_manager);
+
+            // see if any processes left
             if (global_manager->count == 0) {
                 psmDestroy(&global_manager);
+                global_manager = NULL;
+                current_process = NULL;
                 return 0;
             }
+
+            // choose a new process to be the current
+            sp = psmPop(global_manager);
+            psmPushToFront(global_manager, sp);
+            current_process = psmFind(global_manager, sp);
+            return sp;
         }
     }
 
-    // update normally
-    current_process->sp = cursp;
-    process_t* select_process = psmRemoveFromFront(global_manager);
-    psmAddToBack(global_manager, select_process);
-    current_process = select_process;
-    return current_process->sp;
+    // if cursp != 0
+
+    // update process with cursp
+    unsigned int sp = psmPop(global_manager);
+    psmPushToBack(global_manager, cursp);
+
+    // choose new as current    
+    sp = psmPop(global_manager);
+    psmPushToFront(global_manager, sp);
+    current_process = psmFind(global_manager, sp);
+    return sp;
 }
 
 // ! end part 1

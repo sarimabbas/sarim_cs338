@@ -1,124 +1,14 @@
 #include "helper.hpp"
 #include <Arduino.h>
 
+//////////// * create, destroy and search functions
+
 psm* psmCreate(void) {
     psm* manager = (psm*) malloc(sizeof(psm));
+    if (manager == NULL) { return NULL; }
     manager->head = NULL;
-    manager->tail = NULL;
     manager->count = 0;
     return manager;
-}
-
-void psmAddToBack(psm* manager, process_t* process) {
-    if (manager == NULL) {
-        // Serial.println("psmAddToBack: manager is NULL");
-        return;
-    }
-
-    // if empty queue, make head point to new 
-    if (manager->head == NULL) {
-        manager->head = process;
-    }
-
-    // if non-empty queue, make pen-ultimate process point to new
-    if (manager->tail != NULL) {
-        manager->tail->next = process;
-    }
-
-    // set tail to new
-    manager->tail = process;
-
-    // increment count
-    (manager->count)++;
-}
-
-void psmAddToFront(psm* manager, process_t* process) {
-    if (manager == NULL) {
-        // Serial.println("psmAddToFront: manager is NULL");
-        return;
-    }
-
-    // if empty queue, make tail point to new
-    if (manager->tail == NULL) {
-        manager->tail = process;
-    }
-
-    // manipulate head
-    process->next = manager->head;
-    manager->head = process;
-
-    // increment count
-    (manager->count)++;
-}
-
-// ! responsibility to free is with the caller
-process_t* psmRemoveFromFront(psm* manager) {
-    if (manager == NULL) {
-        // Serial.println("psmRemoveFromFront: manager is NULL");
-        return NULL;
-    }
-
-    if (manager->head == NULL) {
-        // Serial.println("psmRemoveFromFront: nothing more to remove");
-        return NULL;
-    }
-
-    // manipulate the head
-    process_t* tmp = manager->head;
-    manager->head = manager->head->next;
-
-    // manipulate the tail
-    if (manager->head == NULL) {
-        manager->tail = NULL;
-    }
-
-    // decrement count
-    (manager->count)--;
-
-    // isolate removed process completely
-    tmp->next = NULL;
-
-    // return pointer to removed process
-    return tmp;
-}
-
-process_t* psmRemoveByPtr(psm* manager, process_t* process) {
-    if (manager == NULL) {
-        // Serial.println("psmRemoveByPtr: manager is NULL");
-        return NULL;
-    }
-
-    process_t* curr = manager->head;
-    process_t* prev = curr;
-    // curr moves through the list
-    while (curr != NULL) {
-        // if a match is found
-        if (curr == process) {
-            // special case if curr is the first element
-            if (manager->head == curr) {
-                manager->head = curr->next;
-            }
-            // special case if curr is the last element
-            if (manager->tail == curr) {
-                manager->tail = curr->next;
-            }
-            // regular case
-            prev->next = curr->next;
-            // make sure no loose ends
-            curr->next = NULL;
-            // decrement count
-            (manager->count)--;
-            // return curr
-            return (curr);
-        }
-        // move prev ahead
-        prev = curr;
-        // if no match, continue for next iteration
-        curr = curr->next;
-    }
-
-    // not found
-    return NULL;
 }
 
 void psmDestroy(psm** managerPtr) {
@@ -148,6 +38,76 @@ process_t* psmFind(psm* manager, unsigned int sp) {
     }
     return NULL;
 }
+
+//////////// * add and remove functions
+
+int psmPushToFront(psm* manager, unsigned int sp) {
+    if (manager == NULL) { return  -1; };
+
+    // create new node
+    process_t* node = (process_t*) malloc(sizeof(process_t));
+    if (node == NULL) { return -1; };
+
+    // initialize the node
+    node->next = manager->head;
+    node->sp = sp;
+
+    // doesn't matter whatever the head is pointing to
+    manager->head = node;
+    (manager->count)++;
+
+    return 0;
+}
+
+int psmPushToBack(psm* manager, unsigned int sp) {
+    if (manager == NULL) { return -1; };
+
+    // malloc new node
+    process_t* node = (process_t*)malloc(sizeof(process_t));
+    if (node == NULL) { return -1; };
+    node->sp = sp;
+    node->next = NULL;
+
+    // first element
+    if (manager->count == 0) {
+        manager->head = node;
+
+    // second or more element
+    } else {
+        process_t* curr = manager->head;
+        process_t* prev = NULL;
+        // iterate prev to pen ultimate node
+        while (curr != NULL) {
+            prev = curr;
+            curr = curr->next;
+        }
+        prev->next = node;
+    }
+
+    // increment and return
+    (manager->count)++;
+    return 0;
+}
+
+unsigned int psmPop(psm* manager) {
+    if (manager == NULL) { return  -1; };
+
+    process_t* tmp = manager->head;
+
+    // not empty queue
+    if (tmp != NULL) {
+        manager->head = tmp->next;
+        unsigned int sp = tmp->sp;
+        free(tmp);
+        (manager->count)--;
+        return sp;
+    }
+
+    // empty 
+    return 0;
+}
+
+//////////// * print functions
 
 void SerialPrintWrapper(char* msg) {
     if (msg == NULL) {
@@ -193,56 +153,4 @@ void pPrint(process_t* process) {
     Serial.print(process->sp);
     Serial.println("]");
     Serial.flush();
-}
-
-int psmPushToFront(psm* manager, unsigned int sp) {
-    if (manager == NULL) { return  -1 };
-
-    process_t* node = (process_t*) malloc(sizeof(process_t));
-    if (node == NULL) { return -1 };
-
-    node->next = manager->head;
-    node->sp = sp;
-
-    manager->head = node;
-    (manager->count)++;
-}
-
-int psmPushToBack(psm* manager, unsigned int sp) {
-    if (manager == NULL) { return  -1 };
-
-    process_t* curr = manager->head;
-    process_t* prev = NULL;
-
-    while (curr != NULL) {
-        prev = curr;
-        curr = curr->next;
-    }
-
-    process_t* node = (process_t*)malloc(sizeof(process_t));
-    if (node == NULL) { return -1 };
-    node->sp = sp;
-    node->next = NULL;
-
-    prev->next = node;
-
-    (manager->count)++;
-}
-
-unsigned int psmPop(psm* manager) {
-    if (manager == NULL) { return  -1 };
-
-    process_t* tmp = manager->head;
-    
-    // not empty
-    if (tmp != NULL) {
-        manager->head = tmp->next;
-        unsigned int sp = tmp->sp;
-        free(tmp);
-        (manager->count)--;
-        return sp;
-    }
-
-    // empty 
-    return -1
 }
