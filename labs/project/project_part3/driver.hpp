@@ -6,6 +6,8 @@
 #define MAX_POS 180
 #define NEUTRAL_POS 90
 #define MIN_POS 0
+#define MOVE_PADDING_SMALL 20
+#define MOVE_PADDING_LARGE 40
 
 // forward backward arm movement, "FB"
 // vertical arm movement, "UD"

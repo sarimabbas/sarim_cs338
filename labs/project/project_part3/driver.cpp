@@ -72,29 +72,31 @@ int gripperClose(void) {
 }
 
 int moveLeft(void) {
-    for (int pos = basePos; pos <= MAX_POS; pos += 1) {
+    for (int pos = basePos; pos <= MAX_POS - MOVE_PADDING_SMALL; pos += 1) {
         manipulateServo("BS", pos);
         delay(15);
     }
 }
 
 int moveRight(void) {
-    for (int pos = basePos; pos >= MIN_POS; pos -= 1) {
+    for (int pos = basePos; pos >= MIN_POS + MOVE_PADDING_SMALL; pos -= 1) {
         manipulateServo("BS", pos);
         delay(15);
     }
 }
 
 int moveUp(void) {
-    for (int pos = upDownPos; pos <= MAX_POS; pos += 1) {
-        manipulateServo("UP", pos);
-        delay(15);
-    }
+    manipulateNeutral("UP");
+    manipulateNeutral("FB");
 }
 
 int moveDown(void) {
-    for (int pos = upDownPos; pos >= MIN_POS; pos -= 1) {
+    for (int pos = upDownPos; pos >= MIN_POS + MOVE_PADDING_LARGE; pos -= 1) {
         manipulateServo("UP", pos);
+        delay(15);
+    }
+    for (int pos = frontBackPos; pos <= MAX_POS - MOVE_PADDING_SMALL; pos += 1) {
+        manipulateServo("FB", pos);
         delay(15);
     }
 }
