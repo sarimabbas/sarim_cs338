@@ -23,10 +23,11 @@ int manipulateServo(const char* servo, int pos);
 // convenience methods based on empirical thresholds
 int gripperOpen(void); 
 int gripperClose(void);
-// int moveLeft(void);
-// int moveRight(void);
-// int moveMiddle(void);
-// int moveUp(void);
-// int moveDown(void);
+int moveLeft(void);
+int moveRight(void);
+int moveMiddle(void);
+int moveUp(void);
+int moveDown(void);
+int manipulateNeutral(const char* servo); 
 
 #endif

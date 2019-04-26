@@ -57,16 +57,100 @@ int manipulateServo(const char* servo, int pos) {
     return 0;
 }
 
-int gripperClose(void) {
-    for (int pos = MIN_POS; pos <= MAX_POS; pos += 1) {
+int gripperOpen(void) {
+    for (int pos = gripperPos; pos <= MAX_POS; pos += 1) {
         manipulateServo("GR", pos);
         delay(15);
     }
 }
 
-int gripperOpen(void) {
-    for (int pos = MAX_POS; pos >= MIN_POS; pos -= 1) {
+int gripperClose(void) {
+    for (int pos = gripperPos; pos >= MIN_POS; pos -= 1) {
         manipulateServo("GR", pos);
         delay(15);
     }
+}
+
+int moveLeft(void) {
+    for (int pos = basePos; pos <= MAX_POS; pos += 1) {
+        manipulateServo("BS", pos);
+        delay(15);
+    }
+}
+
+int moveRight(void) {
+    for (int pos = basePos; pos >= MIN_POS; pos -= 1) {
+        manipulateServo("BS", pos);
+        delay(15);
+    }
+}
+
+int moveUp(void) {
+    for (int pos = upDownPos; pos <= MAX_POS; pos += 1) {
+        manipulateServo("UP", pos);
+        delay(15);
+    }
+}
+
+int moveDown(void) {
+    for (int pos = upDownPos; pos >= MIN_POS; pos -= 1) {
+        manipulateServo("UP", pos);
+        delay(15);
+    }
+}
+
+int manipulateNeutral(const char* servo) {
+    int pos;
+    if (strcmp("FB", servo) == 0) {
+        if (frontBackPos < NEUTRAL_POS) {
+            for (pos = frontBackPos; pos <= NEUTRAL_POS; pos += 1) {
+                manipulateServo("FB", pos);
+                delay(15);
+            }
+        } else {
+            for (pos = frontBackPos; pos >= NEUTRAL_POS; pos -= 1) {
+                manipulateServo("FB", pos);
+                delay(15);
+            }
+        }
+    } else if (strcmp("UP", servo) == 0) {
+        if (upDownPos < NEUTRAL_POS) {
+            for (pos = upDownPos; pos <= NEUTRAL_POS; pos += 1) {
+                manipulateServo("UP", pos);
+                delay(15);
+            }
+        } else {
+            for (pos = upDownPos; pos >= NEUTRAL_POS; pos -= 1) {
+                manipulateServo("UP", pos);
+                delay(15);
+            }
+        }
+    } else if (strcmp("GR", servo) == 0) {
+        if (gripperPos < NEUTRAL_POS) {
+            for (pos = gripperPos; pos <= NEUTRAL_POS; pos += 1) {
+                manipulateServo("GR", pos);
+                delay(15);
+            }
+        } else {
+            for (pos = gripperPos; pos >= NEUTRAL_POS; pos -= 1) {
+                manipulateServo("GR", pos);
+                delay(15);
+            }
+        }
+    } else if (strcmp("BS", servo) == 0) {
+        if (basePos < NEUTRAL_POS) {
+            for (pos = basePos; pos <= NEUTRAL_POS; pos += 1) {
+                manipulateServo("BS", pos);
+                delay(15);
+            }
+        } else {
+            for (pos = basePos; pos >= NEUTRAL_POS; pos -= 1) {
+                manipulateServo("BS", pos);
+                delay(15);
+            }
+        }
+    } else {
+        return -1;
+    }
+    return 0;
 }
