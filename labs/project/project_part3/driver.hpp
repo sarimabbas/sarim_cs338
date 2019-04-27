@@ -30,6 +30,7 @@ int moveRight(void);
 int moveMiddle(void);
 int moveUp(void);
 int moveDown(void);
-int manipulateNeutral(const char* servo); 
+int manipulateNeutral(const char* servo);
+long getServoPos(const char* servo);
 
 #endif

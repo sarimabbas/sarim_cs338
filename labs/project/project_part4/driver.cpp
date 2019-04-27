@@ -156,3 +156,17 @@ int manipulateNeutral(const char* servo) {
     }
     return 0;
 }
+
+long getServoPos(const char* servo) {
+    if (strcmp("FB", servo) == 0) {
+       return frontBackPos;
+    } else if (strcmp("UP", servo) == 0) {
+        return upDownPos;
+    } else if (strcmp("GR", servo) == 0) {
+        return gripperPos;
+    } else if (strcmp("BS", servo) == 0) {
+        return basePos;
+    } else {
+        return -1;
+    }
+}
